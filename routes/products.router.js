@@ -8,8 +8,8 @@ const ProductsService = require('../services/products.services');
 const services = new ProductsService();
 
 //---- GET PRODUCTS  -------//
-router.get('/',(req,res)=>{
-  const products = services.find();
+router.get('/',async (req,res)=>{
+  const products = await services.find();
   res.json(products);
 });
 
@@ -18,33 +18,43 @@ router.get('/filter',(req,res)=>{
 });
 
 //-------- PRODUCTS FOR ID ----------//
-router.get('/:id',(req,res)=>{
+router.get('/:id',async (req,res,next)=>{
+try {
   const {id}=req.params;
-  const product = services.findOne(id);
+  const product = await services.findOne(id);
   res.json(product)
+} catch (error) {
+  next(error);
+}
 
 });
 
 //--------CREATE PRODUCTS WITH POST---------//
 
-router.post('/',(req,res)=>{
+router.post('/',async (req,res)=>{
   const body= req.body;
-  const newProduct = services.create(body);
+  const newProduct = await services.create(body);
   res.status(201).json(newProduct);
 });
 
 //------UPDATE PRODUCTS WITH PUT AND PATCH--------//
-router.patch('/:id',(req,res)=>{
+router.patch('/:id',async (req,res)=>{
+try {
   const {id}= req.params;
   const body= req.body;
-  const product = services.update(id,body);
+  const product = await services.update(id,body);
   res.json(product);
+} catch (error) {
+    res.status(404).json({
+      message:error.message
+    });
+}
 });
 
 //------DELETE PRODUCTS WITH PUT AND DELETE--------//
-router.delete('/:id',(req,res)=>{
+router.delete('/:id',async (req,res)=>{
   const {id}= req.params;
-  const product = services.delete(id);
+  const product = await services.delete(id);
   res.json(product);
 });
 

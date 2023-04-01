@@ -1,5 +1,6 @@
 const routerApi = require('./routes');
 const express= require('express');
+const {errorHandler,logErros} = require('./middlewares/error.handler');
 const app = express();
 const port = 3000;
 
@@ -15,6 +16,9 @@ app.get('/nueva-ruta',(req,res)=>{
 });
 
 routerApi(app);
+app.use(logErros);
+app.use(errorHandler);
+
 
 //----------- INITIALIZATION OF SERVER ---------//
 app.listen(port,()=>{
