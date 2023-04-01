@@ -1,4 +1,5 @@
 const {faker}= require('@faker-js/faker');
+const boom = require('@hapi/boom');
 
 class ProductsService{
 
@@ -14,7 +15,8 @@ class ProductsService{
           id: faker.datatype.uuid(),
           name: faker.commerce.productName(),
           price:parseInt(faker.commerce.price(),10),
-          image: faker.image.imageUrl()
+          image: faker.image.imageUrl(),
+          isBlock:faker.datatype.boolean(),
         });
     }
   }
@@ -37,14 +39,21 @@ class ProductsService{
   }
 
   async findOne(id){
-    const name =  this.getTotal();
-    return this.products.find(item => item.id ===id);
+    const product= this.products.find(item => item.id ===id);
+    if (!product) {
+      throw boom.notFound('Product Not Found !!');
+    }
+    if(product.isBlock){
+      throw boom.conflict('Product is BLOCK !!');
+    }else {
+      return product;
+    }
   }
 
   async update(id,changes){
     const index = this.products.findIndex(item =>item.id ===id);
     if (index===-1) {
-      throw new Error('Product Not Found !!')
+      throw boom.notFound('Product Not Found !!');
     }
     const product = this.products[index];
     this.products[index]={ //==>  ... spread operator
@@ -58,7 +67,7 @@ class ProductsService{
   async delete(id){
     const index = this.products.findIndex(item =>item.id ===id);
     if (index===-1) {
-      throw new Error('Product Not Found !!')
+      throw boom.notFound('Product Not Found !!');
     }
     this.products.splice(index,1); // metodo splice elimina una posicion => recibe dos parametros, la posicion a eliminar y los elementos  apartir de esa posicion que se van a eliminar :D
     return{message:`Product with id: ${id} was deleted`}
