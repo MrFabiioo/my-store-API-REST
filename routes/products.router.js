@@ -29,30 +29,23 @@ router.get('/:id',(req,res)=>{
 
 router.post('/',(req,res)=>{
   const body= req.body;
-  res.status(201).json({
-    message:'product created',
-    data:body,
-  });
+  const newProduct = services.create(body);
+  res.status(201).json(newProduct);
 });
 
 //------UPDATE PRODUCTS WITH PUT AND PATCH--------//
 router.patch('/:id',(req,res)=>{
   const {id}= req.params;
   const body= req.body;
-  res.json({
-    message:'product updated',
-    data:body,
-    id,
-  });
+  const product = services.update(id,body);
+  res.json(product);
 });
 
 //------DELETE PRODUCTS WITH PUT AND DELETE--------//
 router.delete('/:id',(req,res)=>{
   const {id}= req.params;
-  res.json({
-    message:'product updated',
-    id,
-  });
+  const product = services.delete(id);
+  res.json(product);
 });
 
 module.exports = router;
