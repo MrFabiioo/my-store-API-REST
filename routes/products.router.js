@@ -2,6 +2,8 @@
 const express = require('express');
 const router = express.Router();
 const ProductsService = require('../services/products.services');
+const validatorHandler =  require('../middlewares/validator.handler');
+const {getProductSchema,updateProductSchema,createProductSchema}= require('../schemas/product.schema');
 
 //----instances ----//
 
@@ -18,36 +20,43 @@ router.get('/filter',(req,res)=>{
 });
 
 //-------- PRODUCTS FOR ID ----------//
-router.get('/:id',async (req,res,next)=>{
-try {
-  const {id}=req.params;
-  const product = await services.findOne(id);
-  res.json(product)
-} catch (error) {
-  next(error);
-}
+router.get('/:id',
+  validatorHandler(getProductSchema,'params'),
+  async (req,res,next)=>{
+    try {
+      const {id}=req.params;
+      const product = await services.findOne(id);
+      res.json(product)
+    } catch (error) {
+      next(error);
+    }
 
 });
 
 //--------CREATE PRODUCTS WITH POST---------//
 
-router.post('/',async (req,res)=>{
-  const body= req.body;
-  const newProduct = await services.create(body);
-  res.status(201).json(newProduct);
-});
+router.post('/',
+  validatorHandler(createProductSchema,'body'),
+      async (req,res)=>{
+        const body= req.body;
+        const newProduct = await services.create(body);
+        res.status(201).json(newProduct);
+      });
 
 //------UPDATE PRODUCTS WITH PUT AND PATCH--------//
-router.patch('/:id',async (req,res,next)=>{
-try {
-  const {id}= req.params;
-  const body= req.body;
-  const product = await services.update(id,body);
-  res.json(product);
-} catch (error) {
-    next(error);
-}
-});
+router.patch('/:id',
+  validatorHandler(getProductSchema,'params'),
+  validatorHandler(updateProductSchema,'body'),
+      async (req,res,next)=>{
+        try {
+          const {id}= req.params;
+          const body= req.body;
+          const product = await services.update(id,body);
+          res.json(product);
+        } catch (error) {
+            next(error);
+      }
+  });
 
 //------DELETE PRODUCTS WITH PUT AND DELETE--------//
 router.delete('/:id',async (req,res)=>{
